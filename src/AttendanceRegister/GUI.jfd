@@ -1,0 +1,134 @@
+JFDML JFormDesigner: "6.0.2.0.116" Java: "1.8.0_152-release" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+			"$horizontalGroup": "par l {seq {space :::p, par t {seq {comp PartiList:::p::p, space :::x, par l {comp PartPanel:::p::p, comp SavePanel:::p::p}}, seq {comp attPanel:::::x, space :::p, comp navPanel:::p::p}}, space :p:184:p}}"
+			"$verticalGroup": "par l {seq l {space :p:19:p, par l:::p {comp attPanel:::::x, comp navPanel:::::x}, space :::p, par l {seq {comp PartPanel:::p::p, space ::92:x, comp SavePanel:::p::p}, comp PartiList::::306:x}, space :::p}}"
+		} ) {
+			name: "this"
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq t {space :p:94:p, par t {comp lAttDate:::p::p, comp lAttSubject:::p::p}, space :::p, par l {comp txtAttDate:::p:103:p, comp txtAttSubject:::p:196:p}, space :p:61:p}}"
+				"$verticalGroup": "par l {seq l {par b {comp txtAttDate::b:p::p, comp lAttDate::b:p::p}, space :::p, par b {comp txtAttSubject::b:p::p, comp lAttSubject::b:p::p}, space ::15:x}}"
+			} ) {
+				name: "attPanel"
+				"border": new javax.swing.border.TitledBorder( "Attendance" )
+				"background": new java.awt.Color( 255, 204, 204, 255 )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lAttDate"
+					"text": "Date: "
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lAttSubject"
+					"text": "Subject: "
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtAttDate"
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtAttSubject"
+				} )
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq {space :p:6:p, comp bPrev:::p::p, space :::p, comp bNext:::p::p, space s:::p, comp bNew:::p:80:p, space :::p, comp bUpdate:::p:80:p, space :::p, comp bDelete:::p:80:p, space ::59:x}}"
+				"$verticalGroup": "par l {seq l {space :p:10:p, par b {comp bPrev::b:p::p, comp bNew::b:p::p, comp bUpdate::b:p::p, comp bDelete::b:p::p, comp bNext::b:p::p}, space ::30:x}}"
+			} ) {
+				name: "navPanel"
+				"background": new java.awt.Color( 204, 204, 255, 255 )
+				"border": new javax.swing.border.TitledBorder( "Navigate" )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bPrev"
+					"text": "<"
+					"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bPrevActionPerformed", false ) )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bNext"
+					"text": ">"
+					"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bNew"
+					"text": "New"
+					"font": &SwingDerivedFont0 new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+					"foreground": sfield java.awt.Color blue
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bNewActionPerformed", true ) )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bNewActionPerformed", true ) )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bNewActionPerformed", true ) )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bNewActionPerformed", true ) )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bNewActionPerformed", true ) )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bUpdate"
+					"text": "Update"
+					"font": #SwingDerivedFont0
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bDelete"
+					"text": "Delete"
+					"font": #SwingDerivedFont0
+				} )
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq l {space :::p, comp scrollPane1::::669:x, space :::p}}"
+				"$verticalGroup": "par l {seq l {space :::p, comp scrollPane1:::p:263:p, space :::x}}"
+			} ) {
+				name: "PartiList"
+				"border": new javax.swing.border.TitledBorder( "Participant List" )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "scrollPane1"
+					add( new FormComponent( "javax.swing.JTable" ) {
+						name: "tabParti"
+					} )
+				} )
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq {space :::p, par l {comp bNewParti::l:p:80:p, comp bUpdateParti::l:p:80:p, comp bDeleteParti::l:p:80:p}, space :::x}}"
+				"$verticalGroup": "par l {seq l {space :p:13:p, comp bNewParti:::p::p, space :::p, comp bUpdateParti:::p::p, space :::p, comp bDeleteParti:::p::p, space :::x}}"
+			} ) {
+				name: "PartPanel"
+				"border": new javax.swing.border.TitledBorder( "Navigate" )
+				"background": new java.awt.Color( 204, 255, 204, 255 )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bNewParti"
+					"text": "New"
+					"font": &SwingDerivedFont1 new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+					"foreground": sfield java.awt.Color blue
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bNewPartiActionPerformed", true ) )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bUpdateParti"
+					"text": "Update"
+					"font": #SwingDerivedFont1
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bDeleteParti"
+					"text": "Delete"
+					"font": #SwingDerivedFont1
+				} )
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq {space :::p, par l {comp bSave:::p:80:p, comp bExit::l:p:80:p}, space ::17:x}}"
+				"$verticalGroup": "par l {seq l {space :::p, comp bSave:::p::p, space u:::p, comp bExit:::p::p, space :::x}}"
+			} ) {
+				name: "SavePanel"
+				"border": new javax.swing.border.TitledBorder( "" )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bExit"
+					"text": "Exit"
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bExitActionPerformed", false ) )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "bSave"
+					"text": "Save"
+					"foreground": sfield java.awt.Color blue
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bSaveActionPerformed", false ) )
+				} )
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 865, 420 )
+		} )
+	}
+}

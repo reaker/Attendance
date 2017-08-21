@@ -14,17 +14,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class AttMngr {
 
-    private static int attendanceID = 0;
+    private static int maxAttendanceID = 0;
+    private static int minAttendanceID = 0;
     private static AttMngr instance = null;
-    private static int actualKeyMap = 0;
+
+    private static List<Integer> IDList = new ArrayList<>();
+
+    private static int actualKeyMap=0;
     private Map<Integer, Attendance> attendanceMap;
     private NodeList attendanceNodeList;
-    private File xmlFile;
     private Path filePath = Paths.get("C:/Java/AttendanceRegister/atta.xml");
 
 
@@ -49,35 +51,52 @@ public class AttMngr {
                 fr.write("\n<attendanceRegister>");
                 fr.write("\n</attendanceRegister>");
                 fr.close();
-                attendanceID = 0;
+                maxAttendanceID = 0;
+                minAttendanceID = 0;
 
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                //nodeList = null;
             }
         } else {
-            convertXMLToNodeList(xmlFileToOpen);
+            loadXML(xmlFileToOpen);
 
-            //getting max attendanceID
-            int length = attendanceNodeList.getLength();
-            if (length > 0) {
-                Element el = (Element) attendanceNodeList.item(length - 1);
-                attendanceID = Integer.parseInt(el.getAttribute("id"));
+            //getting max and min attendanceID
+            int i=0;
+            for (Map.Entry<Integer,Attendance> entry : attendanceMap.entrySet()) {
+//                System.out.println("Key: "+ entry.getKey()+" Value: " + entry.getValue());
+                if (i==0){
+                    minAttendanceID=entry.getKey();
+                    i++;
+                    setActualKeyMap(minAttendanceID);
+//                    System.out.println("Min is: " + minAttendanceID);
+                }
+                else if (entry.getKey()==attendanceMap.size()){
+                    maxAttendanceID=entry.getKey();
+//                    System.out.println("max is: " +maxAttendanceID);
+                }
             }
         }
     }
 
-    public int getActualKeyMap() {
+    int getActualKeyMap() {
         return actualKeyMap;
     }
 
-    public void setActualKeyMap(int newActualKeyMap) {
+    void setActualKeyMap(int newActualKeyMap) {
         actualKeyMap = newActualKeyMap;
-        System.out.println(actualKeyMap);
+//        System.out.println("Actual key map: "+actualKeyMap);
     }
 
-    private void convertXMLToNodeList(File xmlFileToConvert) {
+    void setFirstAvailableKeyMapForNotEmptyMap(){
+        for (Map.Entry<Integer,Attendance> entry : attendanceMap.entrySet()) {
+            int firstAvailable;
+            firstAvailable= entry.getKey();
+            setActualKeyMap(firstAvailable);
+            break;
+        }
+    }
+
+    private void loadXML(File xmlFileToConvert) {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -85,7 +104,7 @@ public class AttMngr {
             doc.getDocumentElement().normalize();
             attendanceNodeList = doc.getElementsByTagName("attendance");
 
-            System.out.println("Creating Attendance Manager from XML file...");
+            System.out.print("Creating Attendance Manager from XML file...");
 
             for (int i = 0; i < attendanceNodeList.getLength(); i++) {
                 NodeList attendanceChildNodes = (attendanceNodeList.item(i)).getChildNodes();
@@ -104,6 +123,7 @@ public class AttMngr {
                         case "subject": {
                             subject = element.getTextContent();
                             attendanceMap.put(actualAttendanceID, new Attendance(date, subject));
+                            IDList.add(actualAttendanceID);
                             continue;
                         }
                         case "participant": {
@@ -138,7 +158,7 @@ public class AttMngr {
                     }
                 }
             }
-            System.out.println("DONE.");
+            System.out.println("DONE");
         } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();
         }
@@ -172,68 +192,68 @@ public class AttMngr {
 
     }
 
-    void mapListToString() {
-
-        printAll();
-        StringBuilder sb = new StringBuilder("");
-        sb.append("<?xml version=1.0?>\n<attendanceRegister>");
-
-        Element element;
-        for (int i = 0; i < attendanceNodeList.getLength(); i++) {
-            sb.append("<attendance id=\"");
-            Element thisAttendance=(Element)attendanceNodeList.item(i);
-            sb.append(thisAttendance.getAttribute("id")+"\">");
-
-            NodeList childNodes = attendanceNodeList.item(i).getChildNodes();
-            for (int j = 0; j < childNodes.getLength(); j++) {
-                Node nodeElement = childNodes.item(i);
-                element = (Element) childNodes.item(i);
-                element.getElementsByTagName("attendance");
-                switch (element.getNodeName()) {
-                    case "date": {
-                        sb.append("<date>" + element.getTextContent() + "</date>");
-                    }
-                    case "subject": {
-                        sb.append("<subject>" + element.getTextContent() + "</subject>");
-                    }
-                    case "participant": {
-                        sb.append("<participant id=\"" + element.getAttribute("id") + "\">");
-
-                        NodeList nodeListP = element.getChildNodes();
-                        for (int k = 0; k < nodeListP.getLength(); k++) {
-                            System.out.println(nodeListP.item(k).getNodeName());
-                        }
-                        Element elementP;
-
-                        for (int k = 0; k < nodeListP.getLength(); k++) {
-                            elementP = (Element) nodeListP.item(k);   /// dont know why xml document matters if it has or has not newlines.... it shouldn't matter
-
-                            switch (elementP.getNodeName()) {
-
-                                case "firstname": {
-                                    sb.append("<firstname>" + element.getTextContent() + "</firstname>");
-                                }
-                                case "lastname": {
-                                    sb.append("<lastname>" + element.getTextContent() + "</lastname>");
-                                }
-                                case "phoneNumber": {
-                                    sb.append("<phoneNumber>" + element.getTextContent() + "</phoneNumber>");
-                                }
-                                case "birthDate": {
-                                    sb.append("<birthDate>" + element.getTextContent() + "</birthDate>");
-                                }
-                            }
-                        }
-                        sb.append("</participant>");
-                    } //TODO add presence
-                }
-                sb.append("</attendance>");
-            }
-        }
-        sb.append("</attendanceRegister>");
-        System.out.println(sb);
-//        return sb.toString();
-    }
+//    void mapListToString() {
+//
+//        printAll();
+//        StringBuilder sb = new StringBuilder("");
+//        sb.append("<?xml version=1.0?>\n<attendanceRegister>");
+//
+//        Element element;
+//        for (int i = 0; i < attendanceNodeList.getLength(); i++) {
+//            sb.append("<attendance id=\"");
+//            Element thisAttendance=(Element)attendanceNodeList.item(i);
+//            sb.append(thisAttendance.getAttribute("id")+"\">");
+//
+//            NodeList childNodes = attendanceNodeList.item(i).getChildNodes();
+//            for (int j = 0; j < childNodes.getLength(); j++) {
+//                Node nodeElement = childNodes.item(i);
+//                element = (Element) childNodes.item(i);
+//                element.getElementsByTagName("attendance");
+//                switch (element.getNodeName()) {
+//                    case "date": {
+//                        sb.append("<date>" + element.getTextContent() + "</date>");
+//                    }
+//                    case "subject": {
+//                        sb.append("<subject>" + element.getTextContent() + "</subject>");
+//                    }
+//                    case "participant": {
+//                        sb.append("<participant id=\"" + element.getAttribute("id") + "\">");
+//
+//                        NodeList nodeListP = element.getChildNodes();
+//                        for (int k = 0; k < nodeListP.getLength(); k++) {
+//                            System.out.println(nodeListP.item(k).getNodeName());
+//                        }
+//                        Element elementP;
+//
+//                        for (int k = 0; k < nodeListP.getLength(); k++) {
+//                            elementP = (Element) nodeListP.item(k);   /// dont know why xml document matters if it has or has not newlines.... it shouldn't matter
+//
+//                            switch (elementP.getNodeName()) {
+//
+//                                case "firstname": {
+//                                    sb.append("<firstname>" + element.getTextContent() + "</firstname>");
+//                                }
+//                                case "lastname": {
+//                                    sb.append("<lastname>" + element.getTextContent() + "</lastname>");
+//                                }
+//                                case "phoneNumber": {
+//                                    sb.append("<phoneNumber>" + element.getTextContent() + "</phoneNumber>");
+//                                }
+//                                case "birthDate": {
+//                                    sb.append("<birthDate>" + element.getTextContent() + "</birthDate>");
+//                                }
+//                            }
+//                        }
+//                        sb.append("</participant>");
+//                    } //TODO add presence
+//                }
+//                sb.append("</attendance>");
+//            }
+//        }
+//        sb.append("</attendanceRegister>");
+//        System.out.println(sb);
+////        return sb.toString();
+//    }
 
     String getXMLString(){
         StringBuilder sb = new StringBuilder("");
@@ -266,6 +286,7 @@ public class AttMngr {
         return sb.toString();
 
     }
+
     void saveToFile() {
         try {
             Files.delete(filePath);
@@ -281,15 +302,23 @@ public class AttMngr {
     }
 
     void addAttendance(String dateString, String subject) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-
-        attendanceID++;
+        maxAttendanceID++;
         Attendance newAttendance = new Attendance(dateString, subject);
-        actualKeyMap = attendanceID;
-        attendanceMap.put(attendanceID, newAttendance);
+        actualKeyMap = maxAttendanceID;
+        attendanceMap.put(maxAttendanceID, newAttendance);
     }
 
     public NodeList getNodeList() {
         return attendanceNodeList;
+    }
+
+
+
+    public static void setMaxAttendanceID(int maxAttendanceID) {
+        AttMngr.maxAttendanceID = maxAttendanceID;
+    }
+
+    public static void setMinAttendanceID(int minAttendanceID) {
+        AttMngr.minAttendanceID = minAttendanceID;
     }
 }

@@ -1,30 +1,44 @@
-/*
- * Created by JFormDesigner on Tue Aug 15 16:51:23 CEST 2017
- */
-
 package AttendanceRegister;
-
-import com.sun.istack.internal.NotNull;
-import org.w3c.dom.Element;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
 class GUI extends JPanel {
-    final JFileChooser fc = new JFileChooser();
     private AttMngr manager = AttMngr.getInstance();
     private Attendance actualAttendance;
+//    private final String[] columnNames = {"First Name",
+//            "Last Name",
+//            "Phone No",
+//            "Birth Date"};
+    String[] columnNames = {"First Name",
+            "Last Name",
+            "Sport",
+            "# of Years",
+            "Vegetarian"};
+
+    Object[][] data = {
+            {"Kathy", "Smith",
+                    "Snowboarding", new Integer(5), new Boolean(false)},
+            {"John", "Doe",
+                    "Rowing", new Integer(3), new Boolean(true)},
+            {"Sue", "Black",
+                    "Knitting", new Integer(2), new Boolean(false)},
+            {"Jane", "White",
+                    "Speed reading", new Integer(20), new Boolean(true)},
+            {"Joe", "Brown",
+                    "Pool", new Integer(10), new Boolean(false)}
+    };
 
     public final SimpleDateFormat dateAttFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
     public final SimpleDateFormat dateBirthFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-    private static boolean isChanged=false;
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - Sebastian Wijas
@@ -49,12 +63,14 @@ class GUI extends JPanel {
     private JPanel SavePanel;
     private JButton bExit;
     private JButton bSave;
+    private JTextArea textArea1;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 
     GUI() {
         initComponents();
         setMinimumSize(new Dimension(920, 700));
 
+        initTable();
         String firstSubject=null;
         Date firstDate=null;
         //only to shouw first data in GUI
@@ -69,22 +85,34 @@ class GUI extends JPanel {
         setVisible(true);
     }
 
+    private void initTable(){
+        tabParti = new JTable(data, columnNames);
+        scrollPane1= new JScrollPane(tabParti);
+        this.add(scrollPane1);
+        tabParti.setFillsViewportHeight(true);
+    }
+
+
     private void bNewActionPerformed(ActionEvent e) {
         String date = JOptionPane.showInputDialog("Enter date. /format: 31-12-2001 14:10");
         String subject = JOptionPane.showInputDialog("Enter subject.");
+        bUpdate.setEnabled(true);
+        bDelete.setEnabled(true);
 
         manager.addAttendance(date, subject);
         txtAttDate.setText(date);
         txtAttSubject.setText(subject);
     }
 
-
     private void bNewPartiActionPerformed(ActionEvent e) {
+
+
+        //wspiasane dane w tabeli nalezy dodac do Att - > participant
+        // i wyswietlic uaktualnione dane
         String firstName = JOptionPane.showInputDialog("Enter first name:");
         String lastName = JOptionPane.showInputDialog("Enter last name:");
         String phoneNumber = JOptionPane.showInputDialog("Enter phone number:");
         String dateOfBirth = JOptionPane.showInputDialog("Enter date of birth: \nformat: [28-02-2000]");
-
 
         getActualAttendance();
         actualAttendance.addParticipant(firstName, lastName, phoneNumber, dateOfBirth);
@@ -93,32 +121,71 @@ class GUI extends JPanel {
     }
 
     private void bPrevActionPerformed() {
-        if ((manager.getActualKeyMap() - 1) < 0) {
+        int mapSize = manager.getAttMap().size();
+        if (mapSize<= 0) { // jesli zszedles ponizej size to pokaz pustą stronę
+            txtAttSubject.setText("");
+            txtAttDate.setText("");
+            actualAttendance=null;
+            AttMngr.setMinAttendanceID(0);
+            AttMngr.setMaxAttendanceID(0);
 
-        } else {
-            int i = 1;
-            while (i > 0) {
-                try {
-                    manager.setActualKeyMap(manager.getActualKeyMap() - i);
-                    break;
-                } catch (Exception e) {
-                    i++;
-                }
-            }
-//            String temp= manager.getAttList().get(manager.getActualKeyMap()).toString();//getSubject();
-
-            System.out.println(manager.getAttMap().get(0));
-            System.out.println(manager.getAttMap().get(1));
-            System.out.println(manager.getAttMap().get(2));
-
-
-//            txtAttSubject.setText(temp);
-            txtAttDate.setText(manager.getAttMap().get(manager.getActualKeyMap()).getDate().toString());
+        } else if (mapSize==1){
+            JOptionPane.showMessageDialog(null, "End of file.");
         }
+        else {
+            getActualAttendance();
 
+            int i=0,previousIDKeyMap;
+            int actualID= manager.getActualKeyMap();
+            int result=-1;
+            for (Map.Entry<Integer, Attendance> entry : manager.getAttMap().entrySet()) {
+                i++;
+                previousIDKeyMap=entry.getKey();
+                if (previousIDKeyMap<actualID){  //find previous
+                    if (previousIDKeyMap>result){result = previousIDKeyMap;}
+                }
+                if (previousIDKeyMap==actualID && result==-1){result=previousIDKeyMap;}
 
+            }
+            manager.setActualKeyMap(result);
+
+            txtAttSubject.setText(manager.getAttMap().get(manager.getActualKeyMap()).getSubject());
+            txtAttDate.setText(manager.getAttMap().get(manager.getActualKeyMap()).getFormattedDate());
+        }
     }
 
+    private void bNextActionPerformed() {
+        int mapSize = manager.getAttMap().size();
+        if (mapSize<= 0) { // jesli zszedles ponizej size to pokaz pustą stronę
+            txtAttSubject.setText("");
+            txtAttDate.setText("");
+            actualAttendance=null;
+            AttMngr.setMinAttendanceID(0);
+            AttMngr.setMaxAttendanceID(0);
+
+        } else if (mapSize==1){
+            JOptionPane.showMessageDialog(null, "End of file.");
+        }
+        else {
+            getActualAttendance();
+
+            int i=0, nextIDKeyMap;
+            int actualID= manager.getActualKeyMap();
+            int result=999999999;
+            for (Map.Entry<Integer, Attendance> entry : manager.getAttMap().entrySet()) {
+                nextIDKeyMap=entry.getKey();
+                i++;
+                if (nextIDKeyMap>actualID){
+                    if (nextIDKeyMap<result){result = nextIDKeyMap;}
+                }
+                if (nextIDKeyMap==actualID && result==999999999 && mapSize==i){result=nextIDKeyMap;}
+
+            }
+            manager.setActualKeyMap(result);
+            txtAttSubject.setText(manager.getAttMap().get(manager.getActualKeyMap()).getSubject());
+            txtAttDate.setText(manager.getAttMap().get(manager.getActualKeyMap()).getFormattedDate());
+        }
+    }
 
     private void getActualAttendance() {
         actualAttendance = manager.getAttMap().get(manager.getActualKeyMap());
@@ -135,6 +202,45 @@ class GUI extends JPanel {
         for (Frame frame: frames) {
             frame.dispose();
         }
+    }
+
+    private void bUpdateActionPerformed() {
+        getActualAttendance();
+        System.out.println(actualAttendance);
+        actualAttendance.setSubject(txtAttSubject.getText());
+        actualAttendance.setDate(txtAttDate.getText());
+        System.out.println("UPDATED");
+    }
+
+    private void bDeleteActionPerformed() {
+        getActualAttendance();
+
+        int temp = manager.getActualKeyMap();
+        manager.getAttMap().remove(temp);
+
+        if (manager.getAttMap().isEmpty()){
+            txtAttDate.setText("");
+            txtAttSubject.setText("");
+            bDelete.setEnabled(false);
+            bUpdate.setEnabled(false);
+        }
+        else{
+            manager.setFirstAvailableKeyMapForNotEmptyMap();
+            getActualAttendance();
+            txtAttSubject.setText(manager.getAttMap().get(manager.getActualKeyMap()).getSubject());
+            txtAttDate.setText(manager.getAttMap().get(manager.getActualKeyMap()).getFormattedDate());
+        }
+        System.out.println("DELETED.");
+    }
+
+    private void scrollPane1PropertyChange() {
+        // TODO add your code here
+    }
+
+    private void tabPartiPropertyChange() {
+        // TODO add your code here
+
+
     }
 
     private void initComponents() {
@@ -161,6 +267,7 @@ class GUI extends JPanel {
         SavePanel = new JPanel();
         bExit = new JButton();
         bSave = new JButton();
+        textArea1 = new JTextArea();
 
         //======== this ========
 
@@ -208,7 +315,7 @@ class GUI extends JPanel {
                         .addGroup(attPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(txtAttSubject, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(lAttSubject))
-                        .addContainerGap(15, Short.MAX_VALUE))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
         }
 
@@ -220,11 +327,14 @@ class GUI extends JPanel {
             //---- bPrev ----
             bPrev.setText("<");
             bPrev.setFont(bPrev.getFont().deriveFont(bPrev.getFont().getStyle() | Font.BOLD));
+            bPrev.setForeground(Color.blue);
             bPrev.addActionListener(e -> bPrevActionPerformed());
 
             //---- bNext ----
             bNext.setText(">");
             bNext.setFont(bNext.getFont().deriveFont(bNext.getFont().getStyle() | Font.BOLD));
+            bNext.setForeground(Color.blue);
+            bNext.addActionListener(e -> bNextActionPerformed());
 
             //---- bNew ----
             bNew.setText("New");
@@ -241,10 +351,14 @@ class GUI extends JPanel {
             //---- bUpdate ----
             bUpdate.setText("Update");
             bUpdate.setFont(bUpdate.getFont().deriveFont(bUpdate.getFont().getStyle() | Font.BOLD));
+            bUpdate.setForeground(Color.blue);
+            bUpdate.addActionListener(e -> bUpdateActionPerformed());
 
             //---- bDelete ----
             bDelete.setText("Delete");
             bDelete.setFont(bDelete.getFont().deriveFont(bDelete.getFont().getStyle() | Font.BOLD));
+            bDelete.setForeground(Color.blue);
+            bDelete.addActionListener(e -> bDeleteActionPerformed());
 
             GroupLayout navPanelLayout = new GroupLayout(navPanel);
             navPanel.setLayout(navPanelLayout);
@@ -273,7 +387,7 @@ class GUI extends JPanel {
                             .addComponent(bUpdate)
                             .addComponent(bDelete)
                             .addComponent(bNext))
-                        .addContainerGap(30, Short.MAX_VALUE))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
         }
 
@@ -283,6 +397,35 @@ class GUI extends JPanel {
 
             //======== scrollPane1 ========
             {
+                scrollPane1.addPropertyChangeListener(e -> scrollPane1PropertyChange());
+
+                //---- tabParti ----
+                tabParti.setAutoCreateRowSorter(true);
+                tabParti.setCellSelectionEnabled(true);
+                tabParti.setFillsViewportHeight(true);
+                tabParti.setModel(new DefaultTableModel(
+                    new Object[][] {
+                        {null, null, null, null, null},
+                    },
+                    new String[] {
+                        "First Name", "Last Name", "Phone No", "Birth Date", "Present?"
+                    }
+                ) {
+                    Class<?>[] columnTypes = new Class<?>[] {
+                        String.class, String.class, Integer.class, String.class, Boolean.class
+                    };
+                    @Override
+                    public Class<?> getColumnClass(int columnIndex) {
+                        return columnTypes[columnIndex];
+                    }
+                });
+                {
+                    TableColumnModel cm = tabParti.getColumnModel();
+                    cm.getColumn(4).setMinWidth(55);
+                    cm.getColumn(4).setMaxWidth(55);
+                    cm.getColumn(4).setPreferredWidth(55);
+                }
+                tabParti.addPropertyChangeListener(e -> tabPartiPropertyChange());
                 scrollPane1.setViewportView(tabParti);
             }
 
@@ -299,8 +442,7 @@ class GUI extends JPanel {
                 PartiListLayout.createParallelGroup()
                     .addGroup(PartiListLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(scrollPane1, GroupLayout.PREFERRED_SIZE, 263, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE))
             );
         }
 
@@ -310,9 +452,8 @@ class GUI extends JPanel {
             PartPanel.setBackground(new Color(204, 255, 204));
 
             //---- bNewParti ----
-            bNewParti.setText("New");
+            bNewParti.setText("Add");
             bNewParti.setFont(bNewParti.getFont().deriveFont(bNewParti.getFont().getStyle() | Font.BOLD));
-            bNewParti.setForeground(Color.blue);
             bNewParti.addActionListener(e -> bNewPartiActionPerformed(e));
 
             //---- bUpdateParti ----
@@ -354,6 +495,7 @@ class GUI extends JPanel {
 
             //---- bExit ----
             bExit.setText("Exit");
+            bExit.setForeground(Color.blue);
             bExit.addActionListener(e -> bExitActionPerformed());
 
             //---- bSave ----
@@ -370,7 +512,7 @@ class GUI extends JPanel {
                         .addGroup(SavePanelLayout.createParallelGroup()
                             .addComponent(bSave, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
                             .addComponent(bExit, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(17, Short.MAX_VALUE))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             SavePanelLayout.setVerticalGroup(
                 SavePanelLayout.createParallelGroup()
@@ -383,6 +525,11 @@ class GUI extends JPanel {
             );
         }
 
+        //---- textArea1 ----
+        textArea1.setText("Blue - completed\nTODO - black ones \nand table");
+        textArea1.setEnabled(false);
+        textArea1.setEditable(false);
+
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
@@ -392,10 +539,11 @@ class GUI extends JPanel {
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(PartiList, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createParallelGroup()
+                            .addGap(18, 18, Short.MAX_VALUE)
+                            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                                 .addComponent(PartPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(SavePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(SavePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(textArea1)))
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(attPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -413,9 +561,11 @@ class GUI extends JPanel {
                     .addGroup(layout.createParallelGroup()
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(PartPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(textArea1, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(SavePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addComponent(PartiList, GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE))
+                        .addComponent(PartiList, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addContainerGap())
         );
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

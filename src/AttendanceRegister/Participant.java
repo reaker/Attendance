@@ -42,12 +42,11 @@ public class Participant {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Participant that = (Participant) o;
-
-        if (phoneNumber != that.phoneNumber) return false;
-        if (!firstName.equals(that.firstName)) return false;
-        if (!lastName.equals(that.lastName)) return false;
-        return dateOfBirth.equals(that.dateOfBirth);
+        if (o instanceof Participant) {
+            Participant otherObject = (Participant) o;
+            return  phoneNumber==otherObject.phoneNumber && firstName.equals(otherObject.firstName) && lastName.equals(otherObject.lastName) && dateOfBirth.equals(otherObject.dateOfBirth);
+        }
+        return  false;
     }
 
     @Override

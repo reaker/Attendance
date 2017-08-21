@@ -13,6 +13,8 @@ public class Attendance {
     private Map<Integer, Participant> map;
     private Map<Integer, Boolean> mapPresence;
 
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+
     public Attendance(Date date, String subject, Map<Integer, Participant> map) {
         this.date = date;
         this.subject = subject;
@@ -20,7 +22,6 @@ public class Attendance {
     }
 
     Attendance(String date, String subject) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         Date date1 = dateFormat.parse(date,new ParsePosition(0));
         this.date = date1;
         this.subject = subject;
@@ -45,12 +46,30 @@ public class Attendance {
     }
 
 
-    public Date getDate() {
+    Date getDate() {
         return date;
+    }
+    String getFormattedDate() {
+        return dateFormat.format(date);
     }
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    void setDate(String newDate) {
+        this.date = dateFormat.parse(newDate,new ParsePosition(0));
+    }
+
+    @Override
+    public String toString() {
+        return "Attendance{" +
+                "date=" + date +
+                ", subject='" + subject + '\'' +
+                ", map=" + map +
+                ", mapPresence=" + mapPresence +
+                ", dateFormat=" + dateFormat +
+                '}';
     }
 
     public String getSubject() {

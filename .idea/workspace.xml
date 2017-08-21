@@ -3,13 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="85ea9e7f-5165-4c49-bbf0-d9c26d0ec577" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/atta.xml" afterPath="$PROJECT_DIR$/atta.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AttendanceRegister/AttMngr.java" afterPath="$PROJECT_DIR$/src/AttendanceRegister/AttMngr.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AttendanceRegister/Attendance.java" afterPath="$PROJECT_DIR$/src/AttendanceRegister/Attendance.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AttendanceRegister/GUI.java" afterPath="$PROJECT_DIR$/src/AttendanceRegister/GUI.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AttendanceRegister/GUI.jfd" afterPath="$PROJECT_DIR$/src/AttendanceRegister/GUI.jfd" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AttendanceRegister/Main.java" afterPath="$PROJECT_DIR$/src/AttendanceRegister/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AttendanceRegister/Participant.java" afterPath="$PROJECT_DIR$/src/AttendanceRegister/Participant.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -380,7 +373,14 @@
       <option name="project" value="LOCAL" />
       <updated>1503079212541</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added navigation.">
+      <created>1503336950920</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1503336950920</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -420,7 +420,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Project rebuild.&#10;Changed functionality of classes, changed methods and so on...&#10;Completed funcionality of loading XML file.&#10;Completed funcionality of 4 buttons: Save, New Participant, New Attendance, Exit." />
-    <option name="LAST_COMMIT_MESSAGE" value="Project rebuild.&#10;Changed functionality of classes, changed methods and so on...&#10;Completed funcionality of loading XML file.&#10;Completed funcionality of 4 buttons: Save, New Participant, New Attendance, Exit." />
+    <MESSAGE value="Added navigation." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added navigation." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -908,8 +909,8 @@
         <state relative-caret-position="291">
           <caret line="359" column="16" lean-forward="false" selection-start-line="359" selection-start-column="16" selection-end-line="359" selection-end-column="16" />
           <folding>
-            <element signature="e#12256#12257#0" expanded="true" />
-            <element signature="e#12304#12305#0" expanded="true" />
+            <element signature="e#12256#12257#0" expanded="false" />
+            <element signature="e#12304#12305#0" expanded="false" />
           </folding>
         </state>
       </provider>

@@ -1,6 +1,8 @@
 package AttendanceRegister;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.swing.*;
@@ -14,17 +16,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class AttMngr {
+class AttMngr {
 
     private static int maxAttendanceID = 0;
     private static int minAttendanceID = 0;
     private static AttMngr instance = null;
 
-    private static List<Integer> IDList = new ArrayList<>();
-
-    private static int actualKeyMap=0;
+    private static int actualKeyMap = 0;
     private Map<Integer, Attendance> attendanceMap;
     private NodeList attendanceNodeList;
     private Path filePath = Paths.get("C:/Java/AttendanceRegister/atta.xml");
@@ -39,11 +40,19 @@ public class AttMngr {
         return instance;
     }
 
+    static void setMaxAttendanceID(int maxAttendanceID) {
+        AttMngr.maxAttendanceID = maxAttendanceID;
+    }
+
+    static void setMinAttendanceID(int minAttendanceID) {
+        AttMngr.minAttendanceID = minAttendanceID;
+    }
+
     private void loadData() {
         attendanceMap = new LinkedHashMap<>();
         File xmlFileToOpen = new File(String.valueOf(filePath));
         if (!xmlFileToOpen.exists()) {
-            System.out.println("File doesn't exist. Creating new.");
+            System.out.print("File doesn't exist. Creating new...");
             //create new
             try {
                 FileWriter fr = new FileWriter(xmlFileToOpen);
@@ -57,22 +66,19 @@ public class AttMngr {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            System.out.println("DONE");
         } else {
             loadXML(xmlFileToOpen);
 
             //getting max and min attendanceID
-            int i=0;
-            for (Map.Entry<Integer,Attendance> entry : attendanceMap.entrySet()) {
-//                System.out.println("Key: "+ entry.getKey()+" Value: " + entry.getValue());
-                if (i==0){
-                    minAttendanceID=entry.getKey();
+            int i = 0;
+            for (Map.Entry<Integer, Attendance> entry : attendanceMap.entrySet()) {
+                if (i == 0) {
+                    minAttendanceID = entry.getKey();
                     i++;
                     setActualKeyMap(minAttendanceID);
-//                    System.out.println("Min is: " + minAttendanceID);
-                }
-                else if (entry.getKey()==attendanceMap.size()){
-                    maxAttendanceID=entry.getKey();
-//                    System.out.println("max is: " +maxAttendanceID);
+                } else if (entry.getKey() == attendanceMap.size()) {
+                    maxAttendanceID = entry.getKey();
                 }
             }
         }
@@ -84,13 +90,12 @@ public class AttMngr {
 
     void setActualKeyMap(int newActualKeyMap) {
         actualKeyMap = newActualKeyMap;
-//        System.out.println("Actual key map: "+actualKeyMap);
     }
 
-    void setFirstAvailableKeyMapForNotEmptyMap(){
-        for (Map.Entry<Integer,Attendance> entry : attendanceMap.entrySet()) {
+    void setFirstAvailableKeyMapForNotEmptyMap() {
+        for (Map.Entry<Integer, Attendance> entry : attendanceMap.entrySet()) {
             int firstAvailable;
-            firstAvailable= entry.getKey();
+            firstAvailable = entry.getKey();
             setActualKeyMap(firstAvailable);
             break;
         }
@@ -111,7 +116,7 @@ public class AttMngr {
 
                 Element actualAttendance = (Element) attendanceNodeList.item(i);
                 int actualAttendanceID = Integer.parseInt(actualAttendance.getAttribute("id"));
-                String date = null, subject = null;
+                String date = null, subject;
 
                 for (int j = 0; j < attendanceChildNodes.getLength(); j++) {
                     Element element = (Element) attendanceChildNodes.item(j);
@@ -123,14 +128,14 @@ public class AttMngr {
                         case "subject": {
                             subject = element.getTextContent();
                             attendanceMap.put(actualAttendanceID, new Attendance(date, subject));
-                            IDList.add(actualAttendanceID);
                             continue;
                         }
                         case "participant": {
                             NodeList participantChildNodes = element.getChildNodes();
                             Element elementP;
                             String firstName = null, lastName = null, birthDate = null;
-                            int phoneNumber=0;
+                            int phoneNumber = 0;
+                            boolean presence;
 
                             for (int k = 0; k < participantChildNodes.getLength(); k++) {
                                 elementP = (Element) participantChildNodes.item(k);
@@ -150,8 +155,13 @@ public class AttMngr {
                                     }
                                     case "birthDate": {
                                         birthDate = elementP.getTextContent();
-                                        attendanceMap.get(actualAttendanceID).getMap().put(new Participant(firstName, lastName, phoneNumber, birthDate),false);
+                                        continue;
                                     }
+                                    case "presence": {
+                                        presence = Boolean.parseBoolean(elementP.getTextContent());
+                                        attendanceMap.get(actualAttendanceID).getMap().put(new Participant(firstName, lastName, phoneNumber, birthDate), presence);
+                                    }
+
                                 }
                             }
                         }
@@ -163,33 +173,6 @@ public class AttMngr {
             e.printStackTrace();
         }
 //        printAll();
-    }
-
-    public Map<Integer, Attendance> getAttMap() {
-        return attendanceMap;
-    }
-
-    void printAll() {
-
-        System.out.println("==========Showing data in Attendance Manager============");
-        for (Map.Entry<Integer, Attendance> att : attendanceMap.entrySet()
-                ) {
-            Attendance actualAttendance = att.getValue();
-            System.out.println("    Attendance no. " + att.getKey());
-            System.out.println("    Data: " + actualAttendance.getDate().toString());
-            System.out.println("    Subject: " + actualAttendance.getSubject());
-
-            for (Map.Entry<Participant, Boolean> participant : actualAttendance.getMap().entrySet()
-                    ) {
-                System.out.println("        Participant no. " + participant.getKey());
-                System.out.println("             first name: " + participant.getKey().getFirstName());
-                System.out.println("             last name: " + participant.getKey().getLastName());
-                System.out.println("             phone number: " + participant.getKey().getTelephoneNo());
-                System.out.println("             birth date: " + participant.getKey().getDateOfBirth());
-            }
-        }
-
-
     }
 
 //    void mapListToString() {
@@ -245,7 +228,7 @@ public class AttMngr {
 //                            }
 //                        }
 //                        sb.append("</participant>");
-//                    } //TODO add presence
+//                    }
 //                }
 //                sb.append("</attendance>");
 //            }
@@ -255,29 +238,57 @@ public class AttMngr {
 ////        return sb.toString();
 //    }
 
-    String getXMLString(){
+    Map<Integer, Attendance> getAttMap() {
+        return attendanceMap;
+    }
+
+    void printAll() {
+
+        System.out.println("==========Showing data in Attendance Manager============");
+        for (Map.Entry<Integer, Attendance> att : attendanceMap.entrySet()
+                ) {
+            Attendance actualAttendance = att.getValue();
+            System.out.println("    Attendance no. " + att.getKey());
+            System.out.println("    Data: " + actualAttendance.getDate().toString());
+            System.out.println("    Subject: " + actualAttendance.getSubject());
+
+            for (Map.Entry<Participant, Boolean> participant : actualAttendance.getMap().entrySet()
+                    ) {
+                System.out.println("        Participant no. " + participant.getKey());
+                System.out.println("             first name: " + participant.getKey().getFirstName());
+                System.out.println("             last name: " + participant.getKey().getLastName());
+                System.out.println("             phone number: " + participant.getKey().getTelephoneNo());
+                System.out.println("             birth date: " + participant.getKey().getDateOfBirth());
+                System.out.println("             presence: " + participant.getValue());
+            }
+        }
+
+
+    }
+
+    private String getXMLString() {
         StringBuilder sb = new StringBuilder("");
         sb.append("<?xml version=\"1.0\"?>\n<attendanceRegister>");
 
         SimpleDateFormat birthDateFormat = new SimpleDateFormat("dd-MM-yyyy");
         SimpleDateFormat attendanceDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
-        for (Map.Entry<Integer,Attendance> entry: attendanceMap.entrySet()) {
-            sb.append("<attendance id=\""+entry.getKey()+"\">"); //id atendance
+        for (Map.Entry<Integer, Attendance> entry : attendanceMap.entrySet()) {
+            sb.append("<attendance id=\"" + entry.getKey() + "\">"); //id atendance
             String date = attendanceDateFormat.format(entry.getValue().getDate());
-            sb.append("<date>"+date+"</date>");//date
-            sb.append("<subject>"+entry.getValue().getSubject()+"</subject>");
+            sb.append("<date>" + date + "</date>");//date
+            sb.append("<subject>" + entry.getValue().getSubject() + "</subject>");
 
             Map<Participant, Boolean> participantMap = entry.getValue().getMap();
 
-            for (Map.Entry<Participant, Boolean> entryP:participantMap.entrySet()) {
+            for (Map.Entry<Participant, Boolean> entryP : participantMap.entrySet()) {
                 sb.append("<participant>");
                 sb.append("<firstname>" + entryP.getKey().getFirstName() + "</firstname>");
                 sb.append("<lastname>" + entryP.getKey().getLastName() + "</lastname>");
                 sb.append("<phoneNumber>" + entryP.getKey().getTelephoneNo() + "</phoneNumber>");
-                String dateP= birthDateFormat.format(entryP.getKey().getDateOfBirth());
-
-                sb.append("<birthDate>" +  dateP + "</birthDate>" + "</participant>");
+                String dateP = birthDateFormat.format(entryP.getKey().getDateOfBirth());
+                sb.append("<birthDate>" + dateP + "</birthDate>");
+                sb.append("<presence>" + entryP.getValue() + "</presence>" + "</participant>");
             }
             sb.append("</attendance>");
         }
@@ -294,7 +305,7 @@ public class AttMngr {
             FileWriter fr = new FileWriter(newFile);
             fr.write(getXMLString());
             fr.close();
-            JOptionPane.showMessageDialog(null,"File Saved.");
+            JOptionPane.showMessageDialog(null, "File Saved.");
             System.out.println("File saved.");
         } catch (IOException e) {
             e.printStackTrace();
@@ -306,19 +317,5 @@ public class AttMngr {
         Attendance newAttendance = new Attendance(dateString, subject);
         actualKeyMap = maxAttendanceID;
         attendanceMap.put(maxAttendanceID, newAttendance);
-    }
-
-    public NodeList getNodeList() {
-        return attendanceNodeList;
-    }
-
-
-
-    public static void setMaxAttendanceID(int maxAttendanceID) {
-        AttMngr.maxAttendanceID = maxAttendanceID;
-    }
-
-    public static void setMinAttendanceID(int minAttendanceID) {
-        AttMngr.minAttendanceID = minAttendanceID;
     }
 }

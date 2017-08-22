@@ -1,16 +1,16 @@
 package AttendanceRegister;
 
+import javax.swing.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Participant {
 
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     private String firstName, lastName;
     private int phoneNumber;
     private Date dateOfBirth;
-    private boolean presence=false;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
     Participant(String firstName, String lastName, int phoneNumber, String dateOfBirth) {
         this.firstName = firstName;
@@ -20,15 +20,11 @@ public class Participant {
         try {
             this.dateOfBirth = dateFormat.parse(dateOfBirth);
         } catch (ParseException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Wrong input data!");
         }
     }
 
-    public int getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(int phoneNumber) {
+    void setPhoneNumber(int phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -39,9 +35,9 @@ public class Participant {
 
         if (o instanceof Participant) {
             Participant otherObject = (Participant) o;
-            return  phoneNumber==otherObject.phoneNumber && firstName.equals(otherObject.firstName) && lastName.equals(otherObject.lastName) && dateOfBirth.equals(otherObject.dateOfBirth);
+            return phoneNumber == otherObject.phoneNumber && firstName.equals(otherObject.firstName) && lastName.equals(otherObject.lastName) && dateOfBirth.equals(otherObject.dateOfBirth);
         }
-        return  false;
+        return false;
     }
 
     @Override
@@ -57,7 +53,7 @@ public class Participant {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
@@ -65,31 +61,24 @@ public class Participant {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
+    void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-     int getTelephoneNo() {
+    int getTelephoneNo() {
         return phoneNumber;
-    }
-
-    public void setTelephoneNo(int telephoneNo) {
-        this.phoneNumber = telephoneNo;
     }
 
     Date getDateOfBirth() {
         return dateOfBirth;
     }
 
+    void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
     String getStringDateOfBirth() {
         return dateFormat.format(dateOfBirth);
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public boolean getPresence() {
-        return presence;
-    }
 }

@@ -4,13 +4,13 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-			"$horizontalGroup": "par l {seq {space :::p, par t {seq {comp PartiList:::p::p, space s:::x, par l:::p {comp PartPanel:::p::p, comp SavePanel::l:::x, comp textArea1::l:::x}}, seq {comp attPanel:::::x, space :::p, comp navPanel:::p::p}}, space :p:184:p}}"
-			"$verticalGroup": "par l {seq l {space :p:19:p, par l:::p {comp attPanel:::::x, comp navPanel:::::x}, space :::p, par l {seq {comp PartPanel:::p::p, space :::p, comp textArea1::::56:x, space :::p, comp SavePanel:::p::p}, comp PartiList:::::x}, space :::p}}"
+			"$horizontalGroup": "par l {seq l {space :::p, par l:::p {seq {comp attPanel:::p::p, space :::p, comp navPanel:::::x}, comp PartiList:::p::p}, space ::26:x}}"
+			"$verticalGroup": "par l {seq l {space :p:19:p, par l {comp attPanel:::p::p, comp navPanel:::::p}, space :::p, comp PartiList:::::x, space :::p}}"
 		} ) {
 			name: "this"
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-				"$horizontalGroup": "par l {seq t {space :p:94:p, par t {comp lAttDate:::p::p, comp lAttSubject:::p::p}, space :::p, par l {comp txtAttDate:::p:103:p, comp txtAttSubject:::p:196:p}, space :p:61:p}}"
-				"$verticalGroup": "par l {seq l {par b {comp txtAttDate::b:p::p, comp lAttDate::b:p::p}, space :::p, par b {comp txtAttSubject::b:p::p, comp lAttSubject::b:p::p}, space :::x}}"
+				"$horizontalGroup": "par l {seq l {space :::p, par t {comp lAttDate:::p::p, comp lAttSubject:::p::p}, space :::p, par l {comp txtAttDate:::p:103:p, comp txtAttSubject:::p:196:p}, space :::x}}"
+				"$verticalGroup": "par l {seq l {par b {comp txtAttDate::b:p::p, comp lAttDate::b:p::p}, space :::p, par b {comp txtAttSubject::b:p::p, comp lAttSubject::b:p::p}, space :0:0:x}}"
 			} ) {
 				name: "attPanel"
 				"border": new javax.swing.border.TitledBorder( "Attendance" )
@@ -31,7 +31,7 @@ new FormModel {
 				} )
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-				"$horizontalGroup": "par l {seq {space :p:6:p, comp bPrev:::p::p, space :::p, comp bNext:::p::p, space s:::p, comp bNew:::p:80:p, space :::p, comp bUpdate:::p:80:p, space :::p, comp bDelete:::p:80:p, space ::59:x}}"
+				"$horizontalGroup": "par l {seq {space :p:6:p, comp bPrev:::p::p, space :::p, comp bNext:::p::p, space s:::p, comp bNew:::p:80:p, space :::p, comp bUpdate:::p:80:p, space :::p, comp bDelete:::p:80:p, space :::x}}"
 				"$verticalGroup": "par l {seq l {space :p:10:p, par b {comp bPrev::b:p::p, comp bNew::b:p::p, comp bUpdate::b:p::p, comp bDelete::b:p::p, comp bNext::b:p::p}, space :::x}}"
 			} ) {
 				name: "navPanel"
@@ -78,28 +78,19 @@ new FormModel {
 				} )
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-				"$horizontalGroup": "par l {seq l {space :::p, comp scrollPane1::::669:x, space :::p}}"
-				"$verticalGroup": "par l {seq l {space :::p, comp scrollPane1::::256:x}}"
+				"$horizontalGroup": "par l {seq l {space :::p, par l {seq t {space :0:0:x, comp scrollPane1:::p:530:p}, seq l {par l {comp txtFirstName::l:p:113:p, comp label4::l:p:99:p}, space :::p, par l {comp txtLastName::l:p:111:p, comp label5::l:p::p}, space :::p, par l {comp txtPhoneNo:::::x, seq l {comp label6:::p::p, space :0:0:x}}, space :::p, par l {seq {comp txtBirthDate:::p:89:p, space :::p, comp bNewParti:::p:80:p}, comp label7:::p::p}}}, space :::p, par l {comp PartPanel:::p::p, comp SavePanel:::p:104:p}}}"
+				"$verticalGroup": "par l {seq {space :::p, par l {par b {comp label4::b:p::p, comp label5::b:p::p}, par b:t {comp label6::b:p::p, comp label7::b:p::p}}, space :::p, par t {comp bNewParti::t:p::p, par b:t {comp txtFirstName::b:p::p, comp txtBirthDate::b:p::p, comp txtLastName::b:p::p, comp txtPhoneNo::b:p::p}}, space u:::p, comp scrollPane1::::0:x}, seq {space :2:2:p, comp PartPanel:::p:130:p, space ::60:x, comp SavePanel:::p::p}}"
 			} ) {
 				name: "PartiList"
-				"border": new javax.swing.border.TitledBorder( "Participant List" )
+				"border": new javax.swing.border.TitledBorder( "Participant" )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "scrollPane1"
 					addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "scrollPane1PropertyChange", false ) )
 					add( new FormComponent( "javax.swing.JTable" ) {
 						name: "tabParti"
 						"autoCreateRowSorter": true
-						"cellSelectionEnabled": true
 						"fillsViewportHeight": true
-						"model": new com.jformdesigner.model.SwingTableModel( new java.util.Vector {
-							add( new java.util.Vector {
-								add( null )
-								add( null )
-								add( null )
-								add( null )
-								add( null )
-							} )
-						}, new java.util.Vector {
+						"model": new com.jformdesigner.model.SwingTableModel( new java.util.Vector, new java.util.Vector {
 							add( "First Name" )
 							add( "Last Name" )
 							add( "Phone No" )
@@ -112,10 +103,10 @@ new FormModel {
 							add( class java.lang.String )
 							add( class java.lang.Boolean )
 						}, new java.util.Vector {
-							add( null )
-							add( null )
-							add( null )
-							add( null )
+							add( true )
+							add( true )
+							add( true )
+							add( true )
 							add( null )
 						}, new java.util.Vector {
 							add( null )
@@ -124,62 +115,94 @@ new FormModel {
 							add( null )
 							add( new com.jformdesigner.model.SwingTableColumn( null, 55, 55, 55, true ) )
 						} )
+						"cellSelectionEnabled": true
 						addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "tabPartiPropertyChange", false ) )
 					} )
 				} )
-			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-				"$horizontalGroup": "par l {seq {space :::p, par l {comp bNewParti::l:p:80:p, comp bUpdateParti::l:p:80:p, comp bDeleteParti::l:p:80:p}, space :::x}}"
-				"$verticalGroup": "par l {seq l {space :p:13:p, comp bNewParti:::p::p, space :::p, comp bUpdateParti:::p::p, space :::p, comp bDeleteParti:::p::p, space :::x}}"
-			} ) {
-				name: "PartPanel"
-				"border": new javax.swing.border.TitledBorder( "Navigate" )
-				"background": new java.awt.Color( 204, 255, 204, 255 )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtFirstName"
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtLastName"
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtPhoneNo"
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtBirthDate"
+				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "bNewParti"
 					"text": "Add"
 					"font": &SwingDerivedFont1 new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+					"foreground": sfield java.awt.Color blue
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bNewPartiActionPerformed", true ) )
 				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "bUpdateParti"
-					"text": "Update"
-					"font": #SwingDerivedFont1
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+					"$horizontalGroup": "par l {seq t {space :::x, par l {comp bUpdateParti::l:p:80:p, comp bDeleteParti::l:p:80:p, comp bDeleteParti2::l:p:80:p}, space :::p}}"
+					"$verticalGroup": "par l {seq l {space :::p, comp bUpdateParti:::p::p, space :::p, comp bDeleteParti:::p::p, space :::p, comp bDeleteParti2:::p::p, space :::x}}"
+				} ) {
+					name: "PartPanel"
+					"border": new javax.swing.border.TitledBorder( "Navigate" )
+					"background": new java.awt.Color( 204, 255, 204, 255 )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "bUpdateParti"
+						"text": "Update"
+						"font": #SwingDerivedFont1
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bUpdatePartiActionPerformed", false ) )
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "bDeleteParti"
+						"text": "Delete"
+						"font": #SwingDerivedFont1
+						"foreground": sfield java.awt.Color blue
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bDeletePartiActionPerformed", false ) )
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "bDeleteParti2"
+						"text": "Show Table"
+						"font": #SwingDerivedFont1
+					} )
 				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "bDeleteParti"
-					"text": "Delete"
-					"font": #SwingDerivedFont1
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+					"$horizontalGroup": "par l {seq {space :::p, par l {comp bSave:::p:80:p, comp bExit::l:p:80:p}, space :::x}}"
+					"$verticalGroup": "par l {seq l {space :::p, comp bSave:::p::p, space u:::p, comp bExit:::p::p, space :::x}}"
+				} ) {
+					name: "SavePanel"
+					"border": new javax.swing.border.TitledBorder( "" )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "bExit"
+						"text": "Exit"
+						"foreground": sfield java.awt.Color blue
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bExitActionPerformed", false ) )
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "bSave"
+						"text": "Save"
+						"foreground": sfield java.awt.Color blue
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bSaveActionPerformed", false ) )
+					} )
 				} )
-			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-				"$horizontalGroup": "par l {seq {space :::p, par l {comp bSave:::p:80:p, comp bExit::l:p:80:p}, space :::x}}"
-				"$verticalGroup": "par l {seq l {space :::p, comp bSave:::p::p, space u:::p, comp bExit:::p::p, space :::x}}"
-			} ) {
-				name: "SavePanel"
-				"border": new javax.swing.border.TitledBorder( "" )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "bExit"
-					"text": "Exit"
-					"foreground": sfield java.awt.Color blue
-					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bExitActionPerformed", false ) )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label4"
+					"text": "First Name"
 				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "bSave"
-					"text": "Save"
-					"foreground": sfield java.awt.Color blue
-					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "bSaveActionPerformed", false ) )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label5"
+					"text": "Last Name"
 				} )
-			} )
-			add( new FormComponent( "javax.swing.JTextArea" ) {
-				name: "textArea1"
-				"text": "Blue - completed\nTODO - black ones \nand table"
-				"enabled": false
-				"editable": false
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label6"
+					"text": "Phone No."
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label7"
+					"text": "Birth Date"
+				} )
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 865, 420 )
+			"size": new java.awt.Dimension( 715, 420 )
 		} )
 	}
 }

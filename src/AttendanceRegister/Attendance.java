@@ -1,5 +1,7 @@
 package AttendanceRegister;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,41 +12,23 @@ public class Attendance {
 
     private Date date;
     private String subject;
-    private Map<Integer, Participant> map;
-    private Map<Integer, Boolean> mapPresence;
+    private Map<Participant, Boolean> map;
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
-    public Attendance(Date date, String subject, Map<Integer, Participant> map) {
-        this.date = date;
-        this.subject = subject;
-        this.map = new HashMap<Integer, Participant>();
-    }
-
     Attendance(String date, String subject) {
-        Date date1 = dateFormat.parse(date,new ParsePosition(0));
-        this.date = date1;
+        this.date = dateFormat.parse(date,new ParsePosition(0));
         this.subject = subject;
         map=new HashMap<>();
-        mapPresence=new HashMap<>();
     }
 
-
-    public void addParticipant(Participant newParticipant, Integer key) {
-        this.map.put(key, newParticipant);
+    public void addParticipant(Participant newParticipant) {
+        map.put(newParticipant,false);
     }
 
     void addParticipant(String firstName, String lastName, String phoneNumber, String date){
-        Participant newParticipant= new Participant(firstName,lastName,Integer.parseInt(phoneNumber),date);
-        int participantID= newParticipant.getNewId();
-        map.put(participantID,newParticipant);
+        map.put(new Participant(firstName,lastName,Integer.parseInt(phoneNumber),date),false);
     }
-
-    void addParticipant(int participantID,String firstName, String lastName, String phoneNumber, String date){
-        Participant newParticipant= new Participant(participantID,firstName,lastName,Integer.parseInt(phoneNumber),date);
-        map.put(participantID,newParticipant);
-    }
-
 
     Date getDate() {
         return date;
@@ -67,7 +51,6 @@ public class Attendance {
                 "date=" + date +
                 ", subject='" + subject + '\'' +
                 ", map=" + map +
-                ", mapPresence=" + mapPresence +
                 ", dateFormat=" + dateFormat +
                 '}';
     }
@@ -80,11 +63,11 @@ public class Attendance {
         this.subject = subject;
     }
 
-    public Map<Integer, Participant> getMap() {
+    public Map<Participant, Boolean> getMap() {
         return map;
     }
 
-    public void setMap(Map<Integer, Participant> map) {
+    public void setMap(Map<Participant, Boolean> map) {
         this.map = map;
     }
 }

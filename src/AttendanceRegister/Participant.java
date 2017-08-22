@@ -7,12 +7,12 @@ import java.util.Date;
 public class Participant {
 
     private String firstName, lastName;
-    private int phoneNumber, id;
+    private int phoneNumber;
     private Date dateOfBirth;
-    private  static int newId=0;
+    private boolean presence=false;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-    public Participant(String firstName, String lastName, int phoneNumber, String dateOfBirth) {
-        id=newId++;
+    Participant(String firstName, String lastName, int phoneNumber, String dateOfBirth) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -24,17 +24,12 @@ public class Participant {
         }
     }
 
-    public Participant(int participantID, String firstName, String lastName, int phoneNumber, String dateOfBirth) {
-        id=participantID;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public int getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(int phoneNumber) {
         this.phoneNumber = phoneNumber;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        try {
-            this.dateOfBirth = dateFormat.parse(dateOfBirth);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -58,7 +53,7 @@ public class Participant {
         return result;
     }
 
-    public String getFirstName() {
+    String getFirstName() {
         return firstName;
     }
 
@@ -66,7 +61,7 @@ public class Participant {
         this.firstName = firstName;
     }
 
-    public String getLastName() {
+    String getLastName() {
         return lastName;
     }
 
@@ -74,7 +69,7 @@ public class Participant {
         this.lastName = lastName;
     }
 
-    public int getTelephoneNo() {
+     int getTelephoneNo() {
         return phoneNumber;
     }
 
@@ -82,15 +77,19 @@ public class Participant {
         this.phoneNumber = telephoneNo;
     }
 
-    public Date getDateOfBirth() {
+    Date getDateOfBirth() {
         return dateOfBirth;
+    }
+
+    String getStringDateOfBirth() {
+        return dateFormat.format(dateOfBirth);
     }
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public int getNewId() {
-        return newId;
+    public boolean getPresence() {
+        return presence;
     }
 }

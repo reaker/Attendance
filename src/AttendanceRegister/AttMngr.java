@@ -34,13 +34,13 @@ public class AttMngr {
         loadData();
     }
 
-    public static AttMngr getInstance() {
+    static AttMngr getInstance() {
         if (instance == null) instance = new AttMngr();
         return instance;
     }
 
     private void loadData() {
-        attendanceMap = new HashMap<>();
+        attendanceMap = new LinkedHashMap<>();
         File xmlFileToOpen = new File(String.valueOf(filePath));
         if (!xmlFileToOpen.exists()) {
             System.out.println("File doesn't exist. Creating new.");
@@ -127,10 +127,10 @@ public class AttMngr {
                             continue;
                         }
                         case "participant": {
-                            int actualParticipantID = Integer.parseInt(element.getAttribute("id"));
                             NodeList participantChildNodes = element.getChildNodes();
                             Element elementP;
-                            String firstName = null, lastName = null, phoneNumber = null, birthDate = null;
+                            String firstName = null, lastName = null, birthDate = null;
+                            int phoneNumber=0;
 
                             for (int k = 0; k < participantChildNodes.getLength(); k++) {
                                 elementP = (Element) participantChildNodes.item(k);
@@ -145,12 +145,12 @@ public class AttMngr {
                                         continue;
                                     }
                                     case "phoneNumber": {
-                                        phoneNumber = elementP.getTextContent();
+                                        phoneNumber = Integer.parseInt(elementP.getTextContent());
                                         continue;
                                     }
                                     case "birthDate": {
                                         birthDate = elementP.getTextContent();
-                                        attendanceMap.get(actualAttendanceID).addParticipant(actualParticipantID, firstName, lastName, phoneNumber, birthDate);
+                                        attendanceMap.get(actualAttendanceID).getMap().put(new Participant(firstName, lastName, phoneNumber, birthDate),false);
                                     }
                                 }
                             }
@@ -162,7 +162,7 @@ public class AttMngr {
         } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();
         }
-        //printAll();
+//        printAll();
     }
 
     public Map<Integer, Attendance> getAttMap() {
@@ -179,13 +179,13 @@ public class AttMngr {
             System.out.println("    Data: " + actualAttendance.getDate().toString());
             System.out.println("    Subject: " + actualAttendance.getSubject());
 
-            for (Map.Entry<Integer, Participant> participant : actualAttendance.getMap().entrySet()
+            for (Map.Entry<Participant, Boolean> participant : actualAttendance.getMap().entrySet()
                     ) {
                 System.out.println("        Participant no. " + participant.getKey());
-                System.out.println("             first name: " + participant.getValue().getFirstName());
-                System.out.println("             last name: " + participant.getValue().getLastName());
-                System.out.println("             phone number: " + participant.getValue().getTelephoneNo());
-                System.out.println("             birth date: " + participant.getValue().getDateOfBirth());
+                System.out.println("             first name: " + participant.getKey().getFirstName());
+                System.out.println("             last name: " + participant.getKey().getLastName());
+                System.out.println("             phone number: " + participant.getKey().getTelephoneNo());
+                System.out.println("             birth date: " + participant.getKey().getDateOfBirth());
             }
         }
 
@@ -268,14 +268,14 @@ public class AttMngr {
             sb.append("<date>"+date+"</date>");//date
             sb.append("<subject>"+entry.getValue().getSubject()+"</subject>");
 
-            Map<Integer,Participant> participantMap = entry.getValue().getMap();
+            Map<Participant, Boolean> participantMap = entry.getValue().getMap();
 
-            for (Map.Entry<Integer,Participant> entryP:participantMap.entrySet()) {
-                sb.append("<participant id=\"" + entryP.getKey() + "\">");
-                sb.append("<firstname>" + entryP.getValue().getFirstName() + "</firstname>");
-                sb.append("<lastname>" + entryP.getValue().getLastName() + "</lastname>");
-                sb.append("<phoneNumber>" + entryP.getValue().getTelephoneNo() + "</phoneNumber>");
-                String dateP= birthDateFormat.format(entryP.getValue().getDateOfBirth());
+            for (Map.Entry<Participant, Boolean> entryP:participantMap.entrySet()) {
+                sb.append("<participant>");
+                sb.append("<firstname>" + entryP.getKey().getFirstName() + "</firstname>");
+                sb.append("<lastname>" + entryP.getKey().getLastName() + "</lastname>");
+                sb.append("<phoneNumber>" + entryP.getKey().getTelephoneNo() + "</phoneNumber>");
+                String dateP= birthDateFormat.format(entryP.getKey().getDateOfBirth());
 
                 sb.append("<birthDate>" +  dateP + "</birthDate>" + "</participant>");
             }

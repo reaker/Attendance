@@ -1,5 +1,8 @@
 package AttendanceRegister;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
+import javax.mail.Part;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.*;
@@ -13,32 +16,10 @@ import java.util.Map;
 class GUI extends JPanel {
     private AttMngr manager = AttMngr.getInstance();
     private Attendance actualAttendance;
-//    private final String[] columnNames = {"First Name",
-//            "Last Name",
-//            "Phone No",
-//            "Birth Date"};
-    String[] columnNames = {"First Name",
-            "Last Name",
-            "Sport",
-            "# of Years",
-            "Vegetarian"};
-
-    Object[][] data = {
-            {"Kathy", "Smith",
-                    "Snowboarding", new Integer(5), new Boolean(false)},
-            {"John", "Doe",
-                    "Rowing", new Integer(3), new Boolean(true)},
-            {"Sue", "Black",
-                    "Knitting", new Integer(2), new Boolean(false)},
-            {"Jane", "White",
-                    "Speed reading", new Integer(20), new Boolean(true)},
-            {"Joe", "Brown",
-                    "Pool", new Integer(10), new Boolean(false)}
-    };
+    private DefaultTableModel model;
 
     public final SimpleDateFormat dateAttFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
     public final SimpleDateFormat dateBirthFormat = new SimpleDateFormat("dd-MM-yyyy");
-
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - Sebastian Wijas
@@ -56,70 +37,50 @@ class GUI extends JPanel {
     private JPanel PartiList;
     private JScrollPane scrollPane1;
     private JTable tabParti;
-    private JPanel PartPanel;
+    private JTextField txtFirstName;
+    private JTextField txtLastName;
+    private JTextField txtPhoneNo;
+    private JTextField txtBirthDate;
     private JButton bNewParti;
+    private JPanel PartPanel;
     private JButton bUpdateParti;
     private JButton bDeleteParti;
+    private JButton bDeleteParti2;
     private JPanel SavePanel;
     private JButton bExit;
     private JButton bSave;
-    private JTextArea textArea1;
+    private JLabel label4;
+    private JLabel label5;
+    private JLabel label6;
+    private JLabel label7;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 
     GUI() {
         initComponents();
         setMinimumSize(new Dimension(920, 700));
 
-        initTable();
         String firstSubject=null;
         Date firstDate=null;
-        //only to shouw first data in GUI
+        model = (DefaultTableModel)tabParti.getModel();
+        //only to show first data in GUI
         for (Map.Entry<Integer,Attendance> entry  :manager.getAttMap().entrySet()) {
-            firstSubject = entry.getValue().getSubject();
-            firstDate = entry.getValue().getDate();
+            Attendance firstAttendance = entry.getValue();
+            Participant participant;
+            for (Map.Entry<Participant, Boolean> entryP:  firstAttendance.getMap().entrySet()) {
+                participant= entryP.getKey();
+                model.addRow(new Object[]{participant.getFirstName(), participant.getLastName(), participant.getTelephoneNo(),participant.getStringDateOfBirth(),participant.getPresence()});
+            }
+            firstSubject = firstAttendance.getSubject();
+            firstDate = firstAttendance.getDate();
             break;
         }
-
         txtAttDate.setText(dateAttFormat.format(firstDate));
         txtAttSubject.setText(firstSubject);
+
         setVisible(true);
     }
 
-    private void initTable(){
-        tabParti = new JTable(data, columnNames);
-        scrollPane1= new JScrollPane(tabParti);
-        this.add(scrollPane1);
-        tabParti.setFillsViewportHeight(true);
-    }
-
-
-    private void bNewActionPerformed(ActionEvent e) {
-        String date = JOptionPane.showInputDialog("Enter date. /format: 31-12-2001 14:10");
-        String subject = JOptionPane.showInputDialog("Enter subject.");
-        bUpdate.setEnabled(true);
-        bDelete.setEnabled(true);
-
-        manager.addAttendance(date, subject);
-        txtAttDate.setText(date);
-        txtAttSubject.setText(subject);
-    }
-
-    private void bNewPartiActionPerformed(ActionEvent e) {
-
-
-        //wspiasane dane w tabeli nalezy dodac do Att - > participant
-        // i wyswietlic uaktualnione dane
-        String firstName = JOptionPane.showInputDialog("Enter first name:");
-        String lastName = JOptionPane.showInputDialog("Enter last name:");
-        String phoneNumber = JOptionPane.showInputDialog("Enter phone number:");
-        String dateOfBirth = JOptionPane.showInputDialog("Enter date of birth: \nformat: [28-02-2000]");
-
-        getActualAttendance();
-        actualAttendance.addParticipant(firstName, lastName, phoneNumber, dateOfBirth);
-
-
-    }
-
+    //NAVIGATE ATTENDANCE
     private void bPrevActionPerformed() {
         int mapSize = manager.getAttMap().size();
         if (mapSize<= 0) { // jesli zszedles ponizej size to pokaz pustą stronę
@@ -152,6 +113,7 @@ class GUI extends JPanel {
             txtAttSubject.setText(manager.getAttMap().get(manager.getActualKeyMap()).getSubject());
             txtAttDate.setText(manager.getAttMap().get(manager.getActualKeyMap()).getFormattedDate());
         }
+        rewriteTable();
     }
 
     private void bNextActionPerformed() {
@@ -185,23 +147,24 @@ class GUI extends JPanel {
             txtAttSubject.setText(manager.getAttMap().get(manager.getActualKeyMap()).getSubject());
             txtAttDate.setText(manager.getAttMap().get(manager.getActualKeyMap()).getFormattedDate());
         }
+        rewriteTable();
+    }
+
+
+    //CRUD ATTENDANCE
+    private void bNewActionPerformed(ActionEvent e) {
+        String date = JOptionPane.showInputDialog("Enter date. /format: 31-12-2001 14:10");
+        String subject = JOptionPane.showInputDialog("Enter subject.");
+        bUpdate.setEnabled(true);
+        bDelete.setEnabled(true);
+
+        manager.addAttendance(date, subject);
+        txtAttDate.setText(date);
+        txtAttSubject.setText(subject);
     }
 
     private void getActualAttendance() {
         actualAttendance = manager.getAttMap().get(manager.getActualKeyMap());
-    }
-
-    private void bSaveActionPerformed() {
-        manager.saveToFile();
-
-        // TODO add your code here
-    }
-
-    private void bExitActionPerformed() {
-        Frame[] frames=Frame.getFrames();
-        for (Frame frame: frames) {
-            frame.dispose();
-        }
     }
 
     private void bUpdateActionPerformed() {
@@ -243,6 +206,100 @@ class GUI extends JPanel {
 
     }
 
+
+    //SAVE & EXIT
+    private void bSaveActionPerformed() {
+        manager.saveToFile();
+
+        // TODO add your code here
+    }
+
+    private void bExitActionPerformed() {
+        Frame[] frames=Frame.getFrames();
+        for (Frame frame: frames) {
+            frame.dispose();
+        }
+    }
+
+
+
+    //Participant Actions
+    //UPDATE
+    private void bUpdatePartiActionPerformed() {
+        //updates selected row
+
+        getActualAttendance();
+        actualAttendance.getMap();
+
+//        for (Map.Entry<Participant, Boolean> entry : actualAttendance.getMap().entrySet()) {
+//            if (!entry.getKey().equals(new Participant()))
+//
+//        }
+        int row=tabParti.getSelectedRow();
+        String firstName = model.getValueAt(row, 0).toString();
+        String lastName= model.getValueAt(row, 1).toString();
+        String phoneNumber= model.getValueAt(row, 2).toString();
+        String birthDate= model.getValueAt(row, 3).toString();
+
+
+
+
+
+
+                //rewrite table()
+
+
+        model.setValueAt(model.getValueAt(tabParti.getSelectedRow(), tabParti.getSelectedColumn()), tabParti.getSelectedRow(), tabParti.getSelectedColumn()); // 4 razy
+
+    }
+
+    //DELETE
+    private void bDeletePartiActionPerformed() {
+        getActualAttendance();
+        String firstName, lastName, dateOfBirth;
+        int phoneNumber;
+        firstName = (String)tabParti.getValueAt(tabParti.getSelectedRow(), 0);
+        lastName = (String)tabParti.getValueAt(tabParti.getSelectedRow(), 1);
+        phoneNumber = (Integer)tabParti.getValueAt(tabParti.getSelectedRow(), 2);
+        dateOfBirth = (String)tabParti.getValueAt(tabParti.getSelectedRow(), 3);
+        actualAttendance.getMap().remove(new Participant(firstName,lastName,phoneNumber,dateOfBirth));
+        model.removeRow(tabParti.getSelectedRow());
+    }
+
+    void  rewriteTable(){
+        model.setRowCount(0);
+        getActualAttendance();
+        int i=0;
+        for (Map.Entry<Participant, Boolean> entry : actualAttendance.getMap().entrySet()) {
+            model.insertRow(i,new Object[]{entry.getKey().getFirstName(),entry.getKey().getLastName(), entry.getKey().getTelephoneNo(), entry.getKey().getStringDateOfBirth()});
+            i++;
+        }
+    }
+
+
+    //ADD NEW
+    private void bNewPartiActionPerformed(ActionEvent e) {
+
+        String firstName = txtFirstName.getText();
+        String lastName = txtLastName.getText();
+        String phoneNumber = txtPhoneNo.getText();
+        String dateOfBirth = txtBirthDate.getText();
+
+        getActualAttendance();
+        Participant newParticipant= new Participant(firstName, lastName, Integer.parseInt(phoneNumber), dateOfBirth);
+        int mapSize = actualAttendance.getMap().size(); //10
+        actualAttendance.addParticipant(newParticipant); //11
+        int newMapSize = actualAttendance.getMap().size();
+        if (!(newMapSize==mapSize)) { // dont add duplicate content
+            model.addRow(new Object[]{newParticipant.getFirstName(), newParticipant.getLastName(), newParticipant.getTelephoneNo(), newParticipant.getStringDateOfBirth(), newParticipant.getPresence()});
+        }
+        txtFirstName.setText("");
+        txtBirthDate.setText("");
+        txtLastName.setText("");
+        txtPhoneNo.setText("");
+
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner Evaluation license - Sebastian Wijas
@@ -260,14 +317,22 @@ class GUI extends JPanel {
         PartiList = new JPanel();
         scrollPane1 = new JScrollPane();
         tabParti = new JTable();
-        PartPanel = new JPanel();
+        txtFirstName = new JTextField();
+        txtLastName = new JTextField();
+        txtPhoneNo = new JTextField();
+        txtBirthDate = new JTextField();
         bNewParti = new JButton();
+        PartPanel = new JPanel();
         bUpdateParti = new JButton();
         bDeleteParti = new JButton();
+        bDeleteParti2 = new JButton();
         SavePanel = new JPanel();
         bExit = new JButton();
         bSave = new JButton();
-        textArea1 = new JTextArea();
+        label4 = new JLabel();
+        label5 = new JLabel();
+        label6 = new JLabel();
+        label7 = new JLabel();
 
         //======== this ========
 
@@ -294,8 +359,8 @@ class GUI extends JPanel {
             attPanel.setLayout(attPanelLayout);
             attPanelLayout.setHorizontalGroup(
                 attPanelLayout.createParallelGroup()
-                    .addGroup(GroupLayout.Alignment.TRAILING, attPanelLayout.createSequentialGroup()
-                        .addGap(94, 94, 94)
+                    .addGroup(attPanelLayout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(attPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                             .addComponent(lAttDate)
                             .addComponent(lAttSubject))
@@ -303,7 +368,7 @@ class GUI extends JPanel {
                         .addGroup(attPanelLayout.createParallelGroup()
                             .addComponent(txtAttDate, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtAttSubject, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE))
-                        .addGap(61, 61, 61))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             attPanelLayout.setVerticalGroup(
                 attPanelLayout.createParallelGroup()
@@ -315,7 +380,7 @@ class GUI extends JPanel {
                         .addGroup(attPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(txtAttSubject, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(lAttSubject))
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
             );
         }
 
@@ -375,7 +440,7 @@ class GUI extends JPanel {
                         .addComponent(bUpdate, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bDelete, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(59, Short.MAX_VALUE))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             navPanelLayout.setVerticalGroup(
                 navPanelLayout.createParallelGroup()
@@ -393,7 +458,7 @@ class GUI extends JPanel {
 
         //======== PartiList ========
         {
-            PartiList.setBorder(new TitledBorder("Participant List"));
+            PartiList.setBorder(new TitledBorder("Participant"));
 
             //======== scrollPane1 ========
             {
@@ -401,11 +466,9 @@ class GUI extends JPanel {
 
                 //---- tabParti ----
                 tabParti.setAutoCreateRowSorter(true);
-                tabParti.setCellSelectionEnabled(true);
                 tabParti.setFillsViewportHeight(true);
                 tabParti.setModel(new DefaultTableModel(
                     new Object[][] {
-                        {null, null, null, null, null},
                     },
                     new String[] {
                         "First Name", "Last Name", "Phone No", "Birth Date", "Present?"
@@ -425,9 +488,109 @@ class GUI extends JPanel {
                     cm.getColumn(4).setMaxWidth(55);
                     cm.getColumn(4).setPreferredWidth(55);
                 }
+                tabParti.setCellSelectionEnabled(true);
                 tabParti.addPropertyChangeListener(e -> tabPartiPropertyChange());
                 scrollPane1.setViewportView(tabParti);
             }
+
+            //---- bNewParti ----
+            bNewParti.setText("Add");
+            bNewParti.setFont(bNewParti.getFont().deriveFont(bNewParti.getFont().getStyle() | Font.BOLD));
+            bNewParti.setForeground(Color.blue);
+            bNewParti.addActionListener(e -> bNewPartiActionPerformed(e));
+
+            //======== PartPanel ========
+            {
+                PartPanel.setBorder(new TitledBorder("Navigate"));
+                PartPanel.setBackground(new Color(204, 255, 204));
+
+                //---- bUpdateParti ----
+                bUpdateParti.setText("Update");
+                bUpdateParti.setFont(bUpdateParti.getFont().deriveFont(bUpdateParti.getFont().getStyle() | Font.BOLD));
+                bUpdateParti.addActionListener(e -> bUpdatePartiActionPerformed());
+
+                //---- bDeleteParti ----
+                bDeleteParti.setText("Delete");
+                bDeleteParti.setFont(bDeleteParti.getFont().deriveFont(bDeleteParti.getFont().getStyle() | Font.BOLD));
+                bDeleteParti.setForeground(Color.blue);
+                bDeleteParti.addActionListener(e -> bDeletePartiActionPerformed());
+
+                //---- bDeleteParti2 ----
+                bDeleteParti2.setText("Show Table");
+                bDeleteParti2.setFont(bDeleteParti2.getFont().deriveFont(bDeleteParti2.getFont().getStyle() | Font.BOLD));
+
+                GroupLayout PartPanelLayout = new GroupLayout(PartPanel);
+                PartPanel.setLayout(PartPanelLayout);
+                PartPanelLayout.setHorizontalGroup(
+                    PartPanelLayout.createParallelGroup()
+                        .addGroup(GroupLayout.Alignment.TRAILING, PartPanelLayout.createSequentialGroup()
+                            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(PartPanelLayout.createParallelGroup()
+                                .addComponent(bUpdateParti, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(bDeleteParti, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(bDeleteParti2, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
+                            .addContainerGap())
+                );
+                PartPanelLayout.setVerticalGroup(
+                    PartPanelLayout.createParallelGroup()
+                        .addGroup(PartPanelLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(bUpdateParti)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(bDeleteParti)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(bDeleteParti2)
+                            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
+            }
+
+            //======== SavePanel ========
+            {
+                SavePanel.setBorder(new TitledBorder(""));
+
+                //---- bExit ----
+                bExit.setText("Exit");
+                bExit.setForeground(Color.blue);
+                bExit.addActionListener(e -> bExitActionPerformed());
+
+                //---- bSave ----
+                bSave.setText("Save");
+                bSave.setForeground(Color.blue);
+                bSave.addActionListener(e -> bSaveActionPerformed());
+
+                GroupLayout SavePanelLayout = new GroupLayout(SavePanel);
+                SavePanel.setLayout(SavePanelLayout);
+                SavePanelLayout.setHorizontalGroup(
+                    SavePanelLayout.createParallelGroup()
+                        .addGroup(SavePanelLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(SavePanelLayout.createParallelGroup()
+                                .addComponent(bSave, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(bExit, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
+                            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
+                SavePanelLayout.setVerticalGroup(
+                    SavePanelLayout.createParallelGroup()
+                        .addGroup(SavePanelLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(bSave)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(bExit)
+                            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
+            }
+
+            //---- label4 ----
+            label4.setText("First Name");
+
+            //---- label5 ----
+            label5.setText("Last Name");
+
+            //---- label6 ----
+            label6.setText("Phone No.");
+
+            //---- label7 ----
+            label7.setText("Birth Date");
 
             GroupLayout PartiListLayout = new GroupLayout(PartiList);
             PartiList.setLayout(PartiListLayout);
@@ -435,100 +598,64 @@ class GUI extends JPanel {
                 PartiListLayout.createParallelGroup()
                     .addGroup(PartiListLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE)
-                        .addContainerGap())
+                        .addGroup(PartiListLayout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, PartiListLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(scrollPane1, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(PartiListLayout.createSequentialGroup()
+                                .addGroup(PartiListLayout.createParallelGroup()
+                                    .addComponent(txtFirstName, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(label4, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(PartiListLayout.createParallelGroup()
+                                    .addComponent(txtLastName, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(label5))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(PartiListLayout.createParallelGroup()
+                                    .addComponent(txtPhoneNo)
+                                    .addGroup(PartiListLayout.createSequentialGroup()
+                                        .addComponent(label6)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(PartiListLayout.createParallelGroup()
+                                    .addGroup(PartiListLayout.createSequentialGroup()
+                                        .addComponent(txtBirthDate, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(bNewParti, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(label7))))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PartiListLayout.createParallelGroup()
+                            .addComponent(PartPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(SavePanel, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE)))
             );
             PartiListLayout.setVerticalGroup(
                 PartiListLayout.createParallelGroup()
                     .addGroup(PartiListLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE))
-            );
-        }
-
-        //======== PartPanel ========
-        {
-            PartPanel.setBorder(new TitledBorder("Navigate"));
-            PartPanel.setBackground(new Color(204, 255, 204));
-
-            //---- bNewParti ----
-            bNewParti.setText("Add");
-            bNewParti.setFont(bNewParti.getFont().deriveFont(bNewParti.getFont().getStyle() | Font.BOLD));
-            bNewParti.addActionListener(e -> bNewPartiActionPerformed(e));
-
-            //---- bUpdateParti ----
-            bUpdateParti.setText("Update");
-            bUpdateParti.setFont(bUpdateParti.getFont().deriveFont(bUpdateParti.getFont().getStyle() | Font.BOLD));
-
-            //---- bDeleteParti ----
-            bDeleteParti.setText("Delete");
-            bDeleteParti.setFont(bDeleteParti.getFont().deriveFont(bDeleteParti.getFont().getStyle() | Font.BOLD));
-
-            GroupLayout PartPanelLayout = new GroupLayout(PartPanel);
-            PartPanel.setLayout(PartPanelLayout);
-            PartPanelLayout.setHorizontalGroup(
-                PartPanelLayout.createParallelGroup()
-                    .addGroup(PartPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(PartPanelLayout.createParallelGroup()
-                            .addComponent(bNewParti, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(bUpdateParti, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(bDeleteParti, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
-            PartPanelLayout.setVerticalGroup(
-                PartPanelLayout.createParallelGroup()
-                    .addGroup(PartPanelLayout.createSequentialGroup()
-                        .addGap(13, 13, 13)
-                        .addComponent(bNewParti)
+                        .addGroup(PartiListLayout.createParallelGroup()
+                            .addGroup(PartiListLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(label4)
+                                .addComponent(label5))
+                            .addGroup(GroupLayout.Alignment.TRAILING, PartiListLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(label6)
+                                .addComponent(label7)))
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bUpdateParti)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bDeleteParti)
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
-        }
-
-        //======== SavePanel ========
-        {
-            SavePanel.setBorder(new TitledBorder(""));
-
-            //---- bExit ----
-            bExit.setText("Exit");
-            bExit.setForeground(Color.blue);
-            bExit.addActionListener(e -> bExitActionPerformed());
-
-            //---- bSave ----
-            bSave.setText("Save");
-            bSave.setForeground(Color.blue);
-            bSave.addActionListener(e -> bSaveActionPerformed());
-
-            GroupLayout SavePanelLayout = new GroupLayout(SavePanel);
-            SavePanel.setLayout(SavePanelLayout);
-            SavePanelLayout.setHorizontalGroup(
-                SavePanelLayout.createParallelGroup()
-                    .addGroup(SavePanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(SavePanelLayout.createParallelGroup()
-                            .addComponent(bSave, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(bExit, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
-            SavePanelLayout.setVerticalGroup(
-                SavePanelLayout.createParallelGroup()
-                    .addGroup(SavePanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(bSave)
+                        .addGroup(PartiListLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            .addComponent(bNewParti)
+                            .addGroup(PartiListLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtFirstName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtBirthDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtLastName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtPhoneNo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(bExit)
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(PartiListLayout.createSequentialGroup()
+                        .addGap(2, 2, 2)
+                        .addComponent(PartPanel, GroupLayout.PREFERRED_SIZE, 130, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                        .addComponent(SavePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
             );
         }
-
-        //---- textArea1 ----
-        textArea1.setText("Blue - completed\nTODO - black ones \nand table");
-        textArea1.setEnabled(false);
-        textArea1.setEditable(false);
 
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
@@ -536,36 +663,23 @@ class GUI extends JPanel {
             layout.createParallelGroup()
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                         .addGroup(layout.createSequentialGroup()
-                            .addComponent(PartiList, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, Short.MAX_VALUE)
-                            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                .addComponent(PartPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(SavePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(textArea1)))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(attPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(attPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(navPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                    .addGap(184, 184, 184))
+                            .addComponent(navPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(PartiList, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addContainerGap(26, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup()
                 .addGroup(layout.createSequentialGroup()
                     .addGap(19, 19, 19)
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                        .addComponent(attPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(navPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(layout.createParallelGroup()
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(PartPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(textArea1, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(SavePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addComponent(PartiList, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(attPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(navPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(PartiList, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addContainerGap())
         );
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
